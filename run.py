@@ -1,11 +1,14 @@
 import os
 from datetime import datetime
 from flask import Flask, redirect, render_template, request, session, url_for
+from langchain.callbacks import get_openai_callback
+from chat import get_answer, init
 
 app = Flask (__name__)
 app.secret_key = os.getenv("SECRET", "randomstring123")  
 """ Secret key changed to an environment variable. Helps generate session ID """
 messages = []
+model = init("asset/robodone_leaflet.txt")
 
 def add_message(username, message):
     """ Add messages to the 'messages' list """
@@ -34,7 +37,12 @@ def user(username):
     if request.method == "POST":
         username = session["username"]
         message = request.form["message"]
+        ret = ""
+        with get_openai_callback() as cb:
+            ret = model.run(message)
+            print(cb)
         add_message(username,message)
+        add_message("AI", ret)
         return redirect(url_for("user", username=session["username"]))
     
     return render_template("chat.html", username = username, chat_messages = messages)

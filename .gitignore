@@ -1,1 +1,10 @@
 .c9
+.venv*
+.venv*/
+secret*
+asset*
+asset*/
+__pycache__
+__pycache__/
+.chroma
+.chroma/
